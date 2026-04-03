@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Coordenada 90 — Planeación de viajes a medida</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --black: #0a0a0a;
+      --white: #fafaf8;
+      --gray: #e8e6e1;
+      --gray-mid: #b0aba0;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--white);
+      color: var(--black);
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* NAV */
+    nav {
+      display: flex;
+      align-items: center;
+      padding: 22px 48px;
+      border-bottom: 0.5px solid var(--gray);
+      background: var(--white);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      gap: 0;
+    }
+
+    .logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: var(--black);
+      text-transform: uppercase;
+      flex-shrink: 0;
+      text-decoration: none;
+    }
+
+    .nav-divider {
+      width: 0.5px;
+      height: 18px;
+      background: var(--gray);
+      margin: 0 32px;
+      flex-shrink: 0;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+      align-items: center;
+      flex: 1;
+    }
+
+    .nav-links a {
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--black);
+      text-decoration: none;
+      opacity: 0.5;
+      transition: opacity 0.2s;
+    }
+    .nav-links a:hover { opacity: 1; }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--black);
+      border: 0.5px solid var(--gray);
+      padding: 10px 18px;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 500;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      white-space: nowrap;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .nav-cta:hover { border-color: var(--black); background: #f4f3ef; }
+
+    .chat-icon-btn {
+      width: 38px;
+      height: 38px;
+      background: var(--black);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+    .chat-icon-btn:hover { background: #2a2a28; }
+
+    /* HERO */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      height: 340px;
+      border-bottom: 0.5px solid var(--gray);
+    }
+
+    .hero-left {
+      background: var(--black);
+      padding: 48px;
+      display: flex;
+      align-items: center;
+      border-right: 0.5px solid #1e1e1c;
+    }
+
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(36px, 4vw, 54px);
+      font-weight: 300;
+      line-height: 1.08;
+      letter-spacing: -0.01em;
+      color: var(--white);
+    }
+
+    .hero-title em {
+      font-style: italic;
+      opacity: 0.38;
+    }
+
+    .hero-right {
+      position: relative;
+      overflow: hidden;
+      background: #1a1a18;
+    }
+
+    .hero-right img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.85;
+      display: block;
+    }
+
+    .hero-right::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, rgba(10,10,10,0.2) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    /* PROCESO */
+    .section {
+      padding: 64px 48px;
+      border-bottom: 0.5px solid var(--gray);
+    }
+
+    .section-header { margin-bottom: 40px; }
+
+    .section-label {
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gray-mid);
+    }
+
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); }
+
+    .step {
+      padding: 32px 28px;
+      border: 0.5px solid var(--gray);
+      border-right: none;
+      transition: background 0.2s;
+    }
+    .step:last-child { border-right: 0.5px solid var(--gray); }
+    .step:hover { background: #f4f3ef; }
+
+    .step-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 40px;
+      font-weight: 300;
+      color: var(--gray);
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+
+    .step-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--black);
+      margin-bottom: 8px;
+    }
+
+    .step-desc {
+      font-size: 12px;
+      line-height: 1.75;
+      color: var(--black);
+      opacity: 0.5;
+    }
+
+    /* NOSOTROS */
+    .nosotros {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      border-bottom: 0.5px solid var(--gray);
+    }
+
+    .nosotros-left {
+      padding: 48px 32px;
+      border-right: 0.5px solid var(--gray);
+    }
+
+    .nosotros-right { padding: 48px 52px; }
+
+    .nosotros-right p.lead {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 21px;
+      font-weight: 300;
+      line-height: 1.5;
+      color: var(--black);
+      margin-bottom: 14px;
+    }
+
+    .nosotros-right p.lead em { font-style: italic; opacity: 0.4; }
+
+    .nosotros-right p.body {
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--black);
+      opacity: 0.5;
+      max-width: 480px;
+    }
+
+    /* MI VIAJE */
+    .mi-viaje-section {
+      background: var(--black);
+      padding: 64px 48px;
+    }
+
+    .mi-viaje-inner { max-width: 480px; }
+
+    .mi-viaje-label {
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.25);
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .mi-viaje-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 36px;
+      font-weight: 300;
+      color: var(--white);
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+
+    .mi-viaje-desc {
+      font-size: 13px;
+      line-height: 1.8;
+      color: rgba(255,255,255,0.38);
+      margin-bottom: 32px;
+      max-width: 360px;
+    }
+
+    .portal-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--white);
+      color: var(--black);
+      border: none;
+      padding: 12px 26px;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-family: 'DM Sans', sans-serif;
+      text-decoration: none;
+    }
+    .portal-btn:hover { background: var(--gray); }
+
+    /* FOOTER */
+    footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 48px;
+      border-top: 0.5px solid var(--gray);
+    }
+
+    .footer-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .footer-copy {
+      font-size: 11px;
+      color: var(--black);
+      opacity: 0.3;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      nav { padding: 18px 24px; }
+      .nav-divider { margin: 0 20px; }
+      .hero { grid-template-columns: 1fr; height: auto; }
+      .hero-left { padding: 48px 24px; min-height: 260px; }
+      .hero-right { height: 200px; }
+      .section { padding: 48px 24px; }
+      .steps { grid-template-columns: 1fr; }
+      .step { border-right: 0.5px solid var(--gray) !important; border-bottom: none; }
+      .step:last-child { border-bottom: 0.5px solid var(--gray); }
+      .nosotros { grid-template-columns: 1fr; }
+      .nosotros-left { padding: 32px 24px; border-right: none; border-bottom: 0.5px solid var(--gray); }
+      .nosotros-right { padding: 32px 24px; }
+      .mi-viaje-section { padding: 48px 24px; }
+      footer { padding: 20px 24px; flex-direction: column; gap: 8px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a class="logo" href="#">Coordenada 90</a>
+    <div class="nav-divider"></div>
+    <ul class="nav-links">
+      <li><a href="#nosotros">Nosotros</a></li>
+      <li><a href="#mi-viaje">Mi viaje</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-cta">Planear mi viaje</button>
+      <button class="chat-icon-btn" title="Iniciar conversación" aria-label="Chat">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-left">
+      <h1 class="hero-title">
+        Tu viaje,<br>
+        exactamente<br>
+        <em>donde quieres.</em>
+      </h1>
+    </div>
+    <div class="hero-right">
+      <img
+        src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80&auto=format&fit=crop"
+        alt="Destino de viaje"
+      />
+    </div>
+  </section>
+
+  <!-- PROCESO -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-label">El proceso</span>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-title">Cuéntanos tu viaje</div>
+        <div class="step-desc">Conversamos sobre el destino que tienes en mente, tus fechas, estilo de viaje y presupuesto. Sin formularios, sin complicaciones.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-title">Recibe tu propuesta</div>
+        <div class="step-desc">Diseñamos un itinerario detallado y optimizado. Tú decides, ajustas y tienes el control total de tus reservaciones y pagos.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-title">Vive la experiencia</div>
+        <div class="step-desc">Accede a tu portal personal para seguir cada detalle del plan en tiempo real, desde cualquier dispositivo.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NOSOTROS -->
+  <section class="nosotros" id="nosotros">
+    <div class="nosotros-left">
+      <span class="section-label">Nosotros</span>
+    </div>
+    <div class="nosotros-right">
+      <p class="lead">
+        Diseñamos viajes a medida para quienes buscan <em>grandes experiencias</em> sin invertir tiempo en planear.
+      </p>
+      <p class="body">
+        Nos especializamos en la planeación estratégica, creando itinerarios claros, optimizados y personalizados. Definimos cada detalle para que todo fluya con lógica y precisión. Tú gestionas directamente tus reservaciones y pagos, con total control y flexibilidad. Nos encargamos de que cada viaje encuentre su coordenada exacta.
+      </p>
+    </div>
+  </section>
+
+  <!-- MI VIAJE -->
+  <section class="mi-viaje-section" id="mi-viaje">
+    <div class="mi-viaje-inner">
+      <span class="mi-viaje-label">Portal del viajero</span>
+      <h2 class="mi-viaje-title">Mi viaje.</h2>
+      <p class="mi-viaje-desc">
+        Ingresa con tu código de acceso y consulta tu itinerario, documentos y cada detalle de tu viaje en un solo lugar.
+      </p>
+      <a class="portal-btn" href="/mi-viaje">Ingresar →</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">Coordenada 90</div>
+    <span class="footer-copy">© 2025 Coordenada 90</span>
+  </footer>
+
+</body>
+</html>
