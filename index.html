@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Coordenada 90 — Planeación de viajes a medida</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --black: #0a0a0a;
+      --white: #fafaf8;
+      --gray: #e8e6e1;
+      --gray-mid: #b0aba0;
+      --gray-light: #f4f3ef;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--white);
+      color: var(--black);
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      display: flex;
+      align-items: center;
+      padding: 22px 48px;
+      border-bottom: 0.5px solid var(--gray);
+      background: var(--white);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: var(--black);
+      text-transform: uppercase;
+      flex-shrink: 0;
+      text-decoration: none;
+    }
+
+    .nav-divider {
+      width: 0.5px;
+      height: 18px;
+      background: var(--gray);
+      margin: 0 32px;
+      flex-shrink: 0;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+      align-items: center;
+      flex: 1;
+    }
+
+    .nav-links a {
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--black);
+      text-decoration: none;
+      opacity: 0.5;
+      transition: opacity 0.2s;
+    }
+    .nav-links a:hover { opacity: 1; }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: var(--black);
+      border: 0.5px solid var(--gray);
+      padding: 10px 18px;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 500;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      white-space: nowrap;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .nav-cta:hover { border-color: var(--black); background: var(--gray-light); }
+
+    .chat-icon-btn {
+      width: 38px;
+      height: 38px;
+      background: var(--black);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+    .chat-icon-btn:hover { background: #2a2a28; }
+
+    /* ── HERO ── */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      height: 340px;
+      border-bottom: 0.5px solid var(--gray);
+    }
+
+    .hero-left {
+      background: var(--black);
+      padding: 48px;
+      display: flex;
+      align-items: center;
+      border-right: 0.5px solid #1e1e1c;
+    }
+
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(36px, 4vw, 54px);
+      font-weight: 300;
+      line-height: 1.08;
+      letter-spacing: -0.01em;
+      color: var(--white);
+    }
+
+    .hero-title em {
+      font-style: italic;
+      opacity: 0.38;
+    }
+
+    .hero-right {
+      position: relative;
+      overflow: hidden;
+      background: #1a1a18;
+    }
+
+    .hero-right img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.85;
+      display: block;
+    }
+
+    .hero-right::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, rgba(10,10,10,0.2) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    /* ── PROCESO ── */
+    .section {
+      padding: 64px 48px;
+      border-bottom: 0.5px solid var(--gray);
+    }
+
+    .section-header { margin-bottom: 40px; }
+
+    .section-label {
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--gray-mid);
+    }
+
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); }
+
+    .step {
+      padding: 32px 28px;
+      border: 0.5px solid var(--gray);
+      border-right: none;
+      transition: background 0.2s;
+    }
+    .step:last-child { border-right: 0.5px solid var(--gray); }
+    .step:hover { background: var(--gray-light); }
+
+    .step-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 40px;
+      font-weight: 300;
+      color: var(--gray);
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+
+    .step-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--black);
+      margin-bottom: 8px;
+    }
+
+    .step-desc {
+      font-size: 12px;
+      line-height: 1.75;
+      color: var(--black);
+      opacity: 0.5;
+    }
+
+    /* ── NOSOTROS ── */
+    .nosotros {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      border-bottom: 0.5px solid var(--gray);
+    }
+
+    .nosotros-left {
+      padding: 48px 32px;
+      border-right: 0.5px solid var(--gray);
+    }
+
+    .nosotros-right { padding: 48px 52px; }
+
+    .nosotros-right p.lead {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 21px;
+      font-weight: 300;
+      line-height: 1.5;
+      color: var(--black);
+      margin-bottom: 14px;
+    }
+
+    .nosotros-right p.lead em { font-style: italic; opacity: 0.4; }
+
+    .nosotros-right p.body {
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--black);
+      opacity: 0.5;
+      max-width: 480px;
+    }
+
+    /* ── MI VIAJE ── */
+    .mi-viaje-section {
+      background: var(--black);
+      padding: 64px 48px;
+    }
+
+    .mi-viaje-inner { max-width: 480px; }
+
+    .mi-viaje-label {
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.25);
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .mi-viaje-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 36px;
+      font-weight: 300;
+      color: var(--white);
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+
+    .mi-viaje-desc {
+      font-size: 13px;
+      line-height: 1.8;
+      color: rgba(255,255,255,0.38);
+      margin-bottom: 32px;
+      max-width: 360px;
+    }
+
+    .portal-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--white);
+      color: var(--black);
+      border: none;
+      padding: 12px 26px;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-family: 'DM Sans', sans-serif;
+      text-decoration: none;
+    }
+    .portal-btn:hover { background: var(--gray); }
+
+    /* ── FOOTER ── */
+    footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 22px 48px;
+      border-top: 0.5px solid var(--gray);
+    }
+
+    .footer-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .footer-copy {
+      font-size: 11px;
+      color: var(--black);
+      opacity: 0.3;
+    }
+
+    /* ── CHAT ── */
+    .chat-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(10,10,10,0.45);
+      z-index: 200;
+      display: none;
+      align-items: flex-end;
+      justify-content: flex-end;
+      padding: 24px;
+    }
+
+    .chat-overlay.open { display: flex; }
+
+    .chat-window {
+      width: 360px;
+      height: 540px;
+      background: var(--white);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.2);
+      animation: slideUp 0.25s ease;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .chat-header {
+      background: var(--black);
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .chat-brand {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: var(--white);
+      text-transform: uppercase;
+    }
+
+    .chat-status {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      color: rgba(255,255,255,0.4);
+      margin-top: 2px;
+    }
+
+    .status-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #6fcf97;
+    }
+
+    .chat-close-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: rgba(255,255,255,0.4);
+      display: flex;
+      align-items: center;
+      transition: color 0.2s;
+      padding: 4px;
+    }
+    .chat-close-btn:hover { color: var(--white); }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      scroll-behavior: smooth;
+    }
+
+    .chat-messages::-webkit-scrollbar { width: 3px; }
+    .chat-messages::-webkit-scrollbar-thumb { background: var(--gray); }
+
+    .msg { display: flex; flex-direction: column; gap: 3px; animation: fadeMsg 0.3s ease; }
+    .msg.agent { align-items: flex-start; }
+    .msg.user { align-items: flex-end; }
+
+    @keyframes fadeMsg {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .msg-sender {
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gray-mid);
+      padding: 0 4px;
+    }
+
+    .msg-bubble {
+      max-width: 88%;
+      padding: 10px 13px;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .msg.agent .msg-bubble {
+      background: var(--gray-light);
+      color: var(--black);
+      border-radius: 2px 10px 10px 10px;
+    }
+
+    .msg.user .msg-bubble {
+      background: var(--black);
+      color: var(--white);
+      border-radius: 10px 2px 10px 10px;
+    }
+
+    .typing-indicator {
+      display: none;
+      align-items: flex-start;
+    }
+    .typing-indicator.show { display: flex; }
+
+    .typing-bubble {
+      background: var(--gray-light);
+      padding: 11px 14px;
+      border-radius: 2px 10px 10px 10px;
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .typing-bubble span {
+      width: 5px;
+      height: 5px;
+      background: var(--gray-mid);
+      border-radius: 50%;
+      animation: bounce 1.1s infinite;
+    }
+    .typing-bubble span:nth-child(2) { animation-delay: 0.15s; }
+    .typing-bubble span:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes bounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-4px); opacity: 1; }
+    }
+
+    .quick-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 4px 16px 10px;
+    }
+
+    .quick-btn {
+      font-size: 11px;
+      padding: 5px 11px;
+      border: 0.5px solid var(--gray);
+      background: var(--white);
+      color: var(--black);
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      border-radius: 2px;
+      transition: background 0.15s;
+    }
+    .quick-btn:hover { background: var(--gray-light); }
+
+    .chat-input-area {
+      border-top: 0.5px solid var(--gray);
+      padding: 10px 14px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .chat-input {
+      flex: 1;
+      border: 0.5px solid var(--gray);
+      background: var(--white);
+      padding: 9px 12px;
+      font-size: 12px;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--black);
+      outline: none;
+      border-radius: 2px;
+      transition: border-color 0.2s;
+    }
+    .chat-input::placeholder { color: var(--gray-mid); }
+    .chat-input:focus { border-color: var(--black); }
+
+    .send-btn {
+      width: 36px;
+      height: 36px;
+      background: var(--black);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 2px;
+      flex-shrink: 0;
+      transition: background 0.2s;
+    }
+    .send-btn:hover { background: #2a2a28; }
+    .send-btn:disabled { background: var(--gray); cursor: default; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 18px 24px; }
+      .nav-divider { margin: 0 20px; }
+      .hero { grid-template-columns: 1fr; height: auto; }
+      .hero-left { padding: 48px 24px; min-height: 240px; }
+      .hero-right { height: 180px; }
+      .section { padding: 48px 24px; }
+      .steps { grid-template-columns: 1fr; }
+      .step { border-right: 0.5px solid var(--gray) !important; border-bottom: none; }
+      .step:last-child { border-bottom: 0.5px solid var(--gray); }
+      .nosotros { grid-template-columns: 1fr; }
+      .nosotros-left { padding: 32px 24px; border-right: none; border-bottom: 0.5px solid var(--gray); }
+      .nosotros-right { padding: 32px 24px; }
+      .mi-viaje-section { padding: 48px 24px; }
+      footer { padding: 20px 24px; flex-direction: column; gap: 8px; text-align: center; }
+      .chat-window { width: 100%; height: 80vh; }
+      .chat-overlay { padding: 0; align-items: flex-end; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a class="logo" href="#">Coordenada 90</a>
+    <div class="nav-divider"></div>
+    <ul class="nav-links">
+      <li><a href="#nosotros">Nosotros</a></li>
+      <li><a href="#mi-viaje">Mi viaje</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="nav-cta" onclick="openChat()">Planear mi viaje</button>
+      <button class="chat-icon-btn" onclick="openChat()" title="Iniciar conversación" aria-label="Chat">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-left">
+      <h1 class="hero-title">
+        Tu viaje,<br>
+        exactamente<br>
+        <em>donde quieres.</em>
+      </h1>
+    </div>
+    <div class="hero-right">
+      <img
+        src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80&auto=format&fit=crop"
+        alt="Destino de viaje"
+      />
+    </div>
+  </section>
+
+  <!-- PROCESO -->
+  <section class="section">
+    <div class="section-header">
+      <span class="section-label">El proceso</span>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-title">Cuéntanos tu viaje</div>
+        <div class="step-desc">Conversamos sobre el destino que tienes en mente, tus fechas, estilo de viaje y presupuesto. Sin formularios, sin complicaciones.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-title">Recibe tu propuesta</div>
+        <div class="step-desc">Diseñamos un itinerario detallado y optimizado. Tú decides, ajustas y tienes el control total de tus reservaciones y pagos.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-title">Vive la experiencia</div>
+        <div class="step-desc">Accede a tu portal personal para seguir cada detalle del plan en tiempo real, desde cualquier dispositivo.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NOSOTROS -->
+  <section class="nosotros" id="nosotros">
+    <div class="nosotros-left">
+      <span class="section-label">Nosotros</span>
+    </div>
+    <div class="nosotros-right">
+      <p class="lead">
+        Diseñamos viajes a medida para quienes buscan <em>grandes experiencias</em> sin invertir tiempo en planear.
+      </p>
+      <p class="body">
+        Nos especializamos en la planeación estratégica, creando itinerarios claros, optimizados y personalizados. Definimos cada detalle para que todo fluya con lógica y precisión. Tú gestionas directamente tus reservaciones y pagos, con total control y flexibilidad. Nos encargamos de que cada viaje encuentre su coordenada exacta.
+      </p>
+    </div>
+  </section>
+
+  <!-- MI VIAJE -->
+  <section class="mi-viaje-section" id="mi-viaje">
+    <div class="mi-viaje-inner">
+      <span class="mi-viaje-label">Portal del viajero</span>
+      <h2 class="mi-viaje-title">Mi viaje.</h2>
+      <p class="mi-viaje-desc">
+        Ingresa con tu código de acceso y consulta tu itinerario, documentos y cada detalle de tu viaje en un solo lugar.
+      </p>
+      <a class="portal-btn" href="/mi-viaje">Ingresar →</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">Coordenada 90</div>
+    <span class="footer-copy">© 2025 Coordenada 90</span>
+  </footer>
+
+  <!-- CHAT OVERLAY -->
+  <div class="chat-overlay" id="chatOverlay" onclick="handleOverlayClick(event)">
+    <div class="chat-window" id="chatWindow">
+
+      <div class="chat-header">
+        <div>
+          <div class="chat-brand">Coordenada 90</div>
+          <div class="chat-status"><div class="status-dot"></div> En línea</div>
+        </div>
+        <button class="chat-close-btn" onclick="closeChat()" title="Cerrar">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="chat-messages" id="chatMessages">
+        <div class="msg agent">
+          <span class="msg-sender">Asesor</span>
+          <div class="msg-bubble">¡Hola! Bienvenido a Coordenada 90. Estoy aquí para ayudarte a diseñar tu viaje ideal. ¿A dónde te gustaría escaparte?</div>
+        </div>
+      </div>
+
+      <div class="typing-indicator" id="typingIndicator">
+        <div class="typing-bubble"><span></span><span></span><span></span></div>
+      </div>
+
+      <div class="quick-options" id="quickOptions">
+        <button class="quick-btn" onclick="selectOption('Europa')">🌍 Europa</button>
+        <button class="quick-btn" onclick="selectOption('Asia')">🌏 Asia</button>
+        <button class="quick-btn" onclick="selectOption('América')">🌎 América</button>
+        <button class="quick-btn" onclick="selectOption('Aún no sé el destino')">¿Dónde ir?</button>
+      </div>
+
+      <div class="chat-input-area">
+        <input
+          class="chat-input"
+          id="chatInput"
+          type="text"
+          placeholder="Escribe tu mensaje..."
+          onkeydown="handleKey(event)"
+        />
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const agentResponses = [
+      "¡Qué destino tan interesante! ¿Tienes fechas aproximadas en mente o todavía es flexible?",
+      "Perfecto. ¿Cuántas personas viajarían? ¿Es un viaje en pareja, en familia o en grupo?",
+      "Entendido. ¿Qué tipo de experiencia buscas — descanso, cultura y ciudades, aventura, o una mezcla de todo?",
+      "Muy bien. Para diseñar la mejor propuesta, ¿tienes un presupuesto aproximado en mente?",
+      "¡Excelente! Con esta información voy a preparar tu propuesta personalizada. ¿A qué correo te la enviamos?"
+    ];
+
+    let responseIndex = 0;
+    let isTyping = false;
+
+    function openChat() {
+      document.getElementById('chatOverlay').classList.add('open');
+      setTimeout(() => document.getElementById('chatInput').focus(), 300);
+    }
+
+    function closeChat() {
+      document.getElementById('chatOverlay').classList.remove('open');
+    }
+
+    function handleOverlayClick(e) {
+      if (e.target === document.getElementById('chatOverlay')) closeChat();
+    }
+
+    function handleKey(e) {
+      if (e.key === 'Enter') { e.preventDefault(); sendMessage(); }
+    }
+
+    function selectOption(text) {
+      document.getElementById('quickOptions').style.display = 'none';
+      addUserMessage(text);
+      triggerResponse();
+    }
+
+    function sendMessage() {
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text || isTyping) return;
+      input.value = '';
+      document.getElementById('quickOptions').style.display = 'none';
+      addUserMessage(text);
+      triggerResponse();
+    }
+
+    function addUserMessage(text) {
+      const msgs = document.getElementById('chatMessages');
+      const div = document.createElement('div');
+      div.className = 'msg user';
+      div.innerHTML = `<div class="msg-bubble">${text}</div>`;
+      msgs.appendChild(div);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function triggerResponse() {
+      if (responseIndex >= agentResponses.length) return;
+      isTyping = true;
+      document.getElementById('sendBtn').disabled = true;
+      document.getElementById('typingIndicator').classList.add('show');
+      const msgs = document.getElementById('chatMessages');
+      msgs.scrollTop = msgs.scrollHeight;
+
+      setTimeout(() => {
+        document.getElementById('typingIndicator').classList.remove('show');
+        const text = agentResponses[responseIndex++];
+        const div = document.createElement('div');
+        div.className = 'msg agent';
+        div.innerHTML = `<span class="msg-sender">Asesor</span><div class="msg-bubble">${text}</div>`;
+        msgs.appendChild(div);
+        msgs.scrollTop = msgs.scrollHeight;
+        isTyping = false;
+        document.getElementById('sendBtn').disabled = false;
+        document.getElementById('chatInput').focus();
+      }, 1400);
+    }
+  </script>
+
+</body>
+</html>
