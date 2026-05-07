@@ -1,445 +1,707 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Coordenada 90 — Planeación de viajes a medida</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Coordenada 90</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    :root {
-      --black: #0a0a0a;
-      --white: #fafaf8;
-      --gray: #e8e6e1;
-      --gray-mid: #b0aba0;
-    }
+  :root {
+    --ink: #0e0e0e;
+    --paper: #f5f3ef;
+    --muted: #9a9690;
+    --line: rgba(14,14,14,0.12);
+  }
 
-    html { scroll-behavior: smooth; }
+  html, body { width: 100%; height: 100%; overflow-x: hidden; }
 
-    body {
-      background: var(--white);
-      color: var(--black);
-      font-family: 'DM Sans', sans-serif;
-      overflow-x: hidden;
-    }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    cursor: none;
+  }
 
-    /* NAV */
-    nav {
-      display: flex;
-      align-items: center;
-      padding: 22px 48px;
-      border-bottom: 0.5px solid var(--gray);
-      background: var(--white);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      gap: 0;
-    }
+  /* ── CUSTOM CURSOR ── */
+  .cursor {
+    position: fixed;
+    width: 8px; height: 8px;
+    background: var(--ink);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.15s ease;
+    transform: translate(-50%, -50%);
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 32px; height: 32px;
+    border: 1px solid rgba(14,14,14,0.35);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
+  }
 
-    .logo {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 18px;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      color: var(--black);
-      text-transform: uppercase;
-      flex-shrink: 0;
-      text-decoration: none;
-    }
+  /* ── HEADER ── */
+  .header {
+    position: fixed; top: 0; left: 0; right: 0;
+    padding: 24px 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    z-index: 100;
+    background: transparent;
+  }
+  .logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px; font-weight: 400;
+    letter-spacing: 0.3em; text-transform: uppercase;
+    opacity: 0;
+    animation: fadeIn 1s ease 0.5s forwards;
+  }
+  .nav {
+    display: flex; gap: 36px;
+    opacity: 0;
+    animation: fadeIn 1s ease 0.7s forwards;
+  }
+  .nav a {
+    font-size: 11px; font-weight: 500; letter-spacing: 0.18em;
+    text-transform: uppercase; text-decoration: none; color: var(--ink);
+    opacity: 0.5; transition: opacity 0.2s;
+  }
+  .nav a:hover { opacity: 1; }
 
-    .nav-divider {
-      width: 0.5px;
-      height: 18px;
-      background: var(--gray);
-      margin: 0 32px;
-      flex-shrink: 0;
-    }
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    width: 100vw; height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
 
-    .nav-links {
-      display: flex;
-      gap: 32px;
-      list-style: none;
-      align-items: center;
-      flex: 1;
-    }
+  /* ── GLOBE CANVAS ── */
+  #globe-canvas {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    animation: globeReveal 2s ease 0.3s forwards;
+  }
+  @keyframes globeReveal {
+    from { opacity: 0; transform: translate(-50%, -50%) scale(0.92); }
+    to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  }
 
-    .nav-links a {
-      font-size: 11px;
-      font-weight: 400;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--black);
-      text-decoration: none;
-      opacity: 0.5;
-      transition: opacity 0.2s;
-    }
-    .nav-links a:hover { opacity: 1; }
+  /* ── COMPASS SVG ── */
+  .compass-wrap {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    opacity: 0;
+    animation: fadeIn 1.2s ease 1.4s forwards;
+  }
+  .compass-ring {
+    animation: compassPulse 4s ease-in-out infinite;
+    transform-origin: center;
+  }
+  @keyframes compassPulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+  }
+  .needle-n {
+    transform-origin: 50px 50px;
+    animation: needleSway 6s ease-in-out infinite;
+  }
+  @keyframes needleSway {
+    0%   { transform: rotate(0deg); }
+    20%  { transform: rotate(4deg); }
+    50%  { transform: rotate(-3deg); }
+    80%  { transform: rotate(2deg); }
+    100% { transform: rotate(0deg); }
+  }
+  .compass-tick {
+    animation: tickFade 3s ease-in-out infinite;
+  }
+  @keyframes tickFade {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.9; }
+  }
 
-    .nav-right {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-shrink: 0;
-    }
+  /* ── TEXT CONTENT ── */
+  .hero-text {
+    position: absolute;
+    bottom: 10vh; left: 48px;
+    z-index: 20;
+  }
+  .hero-eyebrow {
+    font-size: 10px; font-weight: 500; letter-spacing: 0.25em;
+    text-transform: uppercase; color: var(--muted);
+    opacity: 0;
+    animation: slideUp 0.8s ease 1.8s forwards;
+    margin-bottom: 10px;
+  }
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(48px, 6vw, 88px);
+    font-weight: 300; line-height: 1.0;
+    opacity: 0;
+    animation: slideUp 0.9s ease 2s forwards;
+  }
+  .hero-title em { font-style: italic; }
+  .hero-sub {
+    font-size: 13px; color: var(--muted); font-weight: 300;
+    margin-top: 16px; max-width: 280px; line-height: 1.7;
+    opacity: 0;
+    animation: slideUp 0.9s ease 2.2s forwards;
+  }
+  .hero-cta {
+    margin-top: 32px;
+    display: inline-flex; align-items: center; gap: 12px;
+    font-size: 11px; font-weight: 500; letter-spacing: 0.2em;
+    text-transform: uppercase; text-decoration: none; color: var(--ink);
+    opacity: 0;
+    animation: slideUp 0.9s ease 2.4s forwards;
+    border-bottom: 1px solid var(--ink); padding-bottom: 4px;
+    transition: gap 0.3s ease;
+    cursor: none;
+  }
+  .hero-cta:hover { gap: 20px; }
+  .hero-cta .arrow { font-size: 16px; }
 
-    .nav-cta {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: transparent;
-      color: var(--black);
-      border: 0.5px solid var(--gray);
-      padding: 10px 18px;
-      font-size: 10px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      font-weight: 500;
-      cursor: pointer;
-      transition: border-color 0.2s, background 0.2s;
-      white-space: nowrap;
-      font-family: 'DM Sans', sans-serif;
-    }
-    .nav-cta:hover { border-color: var(--black); background: #f4f3ef; }
+  /* COORDS overlay */
+  .coords-top {
+    position: absolute; top: 10vh; right: 48px;
+    text-align: right; z-index: 20;
+    opacity: 0;
+    animation: fadeIn 1s ease 2.6s forwards;
+  }
+  .coord-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px; letter-spacing: 0.1em; color: var(--muted);
+    line-height: 1.8;
+  }
+  .coord-val span { color: var(--ink); font-weight: 400; }
 
-    .chat-icon-btn {
-      width: 38px;
-      height: 38px;
-      background: var(--black);
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s;
-      flex-shrink: 0;
-    }
-    .chat-icon-btn:hover { background: #2a2a28; }
+  /* SCROLL indicator */
+  .scroll-ind {
+    position: absolute; bottom: 32px; right: 48px;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    z-index: 20;
+    opacity: 0;
+    animation: fadeIn 1s ease 3s forwards;
+  }
+  .scroll-line {
+    width: 1px; height: 48px; background: var(--ink);
+    transform-origin: top;
+    animation: scrollLine 2s ease-in-out infinite;
+  }
+  @keyframes scrollLine {
+    0%   { transform: scaleY(0); opacity: 0; }
+    30%  { opacity: 1; }
+    100% { transform: scaleY(1); opacity: 0; }
+  }
+  .scroll-label {
+    font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--muted); writing-mode: vertical-rl;
+  }
 
-    /* HERO */
-    .hero {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      height: 340px;
-      border-bottom: 0.5px solid var(--gray);
-    }
+  /* GRAIN overlay */
+  .grain {
+    position: fixed; inset: 0; pointer-events: none; z-index: 200;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-size: 200px;
+  }
 
-    .hero-left {
-      background: var(--black);
-      padding: 48px;
-      display: flex;
-      align-items: center;
-      border-right: 0.5px solid #1e1e1c;
-    }
+  /* ── SECTION 2 ── */
+  .section-about {
+    min-height: 80vh;
+    display: flex; align-items: center;
+    padding: 120px 48px;
+    border-top: 1px solid var(--line);
+    position: relative; overflow: hidden;
+  }
+  .about-inner { max-width: 560px; }
+  .about-eyebrow {
+    font-size: 10px; font-weight: 500; letter-spacing: 0.25em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 20px;
+  }
+  .about-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(36px, 4vw, 56px); font-weight: 300; line-height: 1.1;
+    margin-bottom: 24px;
+  }
+  .about-title em { font-style: italic; }
+  .about-body {
+    font-size: 14px; color: #555; line-height: 1.85; font-weight: 300;
+  }
 
-    .hero-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: clamp(36px, 4vw, 54px);
-      font-weight: 300;
-      line-height: 1.08;
-      letter-spacing: -0.01em;
-      color: var(--white);
-    }
+  /* FLOATING NUMBER */
+  .big-num {
+    position: absolute; right: -20px; top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(200px, 22vw, 320px);
+    font-weight: 300; color: transparent;
+    -webkit-text-stroke: 1px rgba(14,14,14,0.06);
+    line-height: 1; pointer-events: none; user-select: none;
+  }
 
-    .hero-title em {
-      font-style: italic;
-      opacity: 0.38;
-    }
+  /* ── KEYFRAMES ── */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 
-    .hero-right {
-      position: relative;
-      overflow: hidden;
-      background: #1a1a18;
-    }
+  @media (max-width: 640px) {
+    .header { padding: 20px 24px; }
+    .nav { display: none; }
+    .hero-text { left: 24px; bottom: 12vh; }
+    .coords-top { right: 24px; }
+    .scroll-ind { right: 24px; }
+    .section-about { padding: 80px 24px; }
+    .section-steps { padding: 48px 24px; }
+    .steps-inner { flex-direction: column; gap: 32px; }
+    .step { padding: 0 !important; }
+    .step-divider { width: 40px; height: 1px; align-self: auto; }
+  }
 
-    .hero-right img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      opacity: 0.85;
-      display: block;
-    }
+  /* ── SECTION STEPS ── */
+  .section-steps {
+    padding: 72px 48px;
+    border-top: 1px solid var(--line);
+  }
+  .steps-inner { max-width: 960px; margin: 0 auto; }
+  .steps-eyebrow {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px; font-weight: 500; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: 40px;
+  }
+  .steps-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+    align-items: center;
+    gap: 0;
+  }
+  .step {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    column-gap: 14px;
+    row-gap: 2px;
+    align-items: center;
+  }
+  .step-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px; font-weight: 300; line-height: 1;
+    color: rgba(14,14,14,0.12);
+    grid-row: 1 / 3;
+    grid-column: 1;
+  }
+  .step-title {
+    font-size: 12px; font-weight: 500;
+    letter-spacing: 0.03em; color: var(--ink);
+    grid-row: 1; grid-column: 2;
+    white-space: nowrap;
+  }
+  .step-desc {
+    font-size: 11px; font-weight: 300;
+    color: var(--muted); line-height: 1.5;
+    grid-row: 2; grid-column: 2;
+  }
+  .step-arrow {
+    font-size: 14px; color: rgba(14,14,14,0.2);
+    padding: 0 16px; flex-shrink: 0;
+    justify-self: center;
+  }
 
-    .hero-right::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to right, rgba(10,10,10,0.2) 0%, transparent 50%);
-      pointer-events: none;
-    }
+  .steps-cta {
+    margin-top: 48px;
+  }
+  .btn-planear {
+    display: inline-flex; align-items: center; gap: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px; font-weight: 500; letter-spacing: 0.2em;
+    text-transform: uppercase; text-decoration: none; color: var(--ink);
+    border-bottom: 1px solid var(--ink); padding-bottom: 4px;
+    transition: gap 0.3s ease;
+    cursor: none;
+  }
+  .btn-planear:hover { gap: 20px; }
 
-    /* PROCESO */
-    .section {
-      padding: 64px 48px;
-      border-bottom: 0.5px solid var(--gray);
-    }
-
-    .section-header { margin-bottom: 40px; }
-
-    .section-label {
-      font-size: 10px;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: var(--gray-mid);
-    }
-
-    .steps { display: grid; grid-template-columns: repeat(3, 1fr); }
-
-    .step {
-      padding: 32px 28px;
-      border: 0.5px solid var(--gray);
-      border-right: none;
-      transition: background 0.2s;
-    }
-    .step:last-child { border-right: 0.5px solid var(--gray); }
-    .step:hover { background: #f4f3ef; }
-
-    .step-num {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 40px;
-      font-weight: 300;
-      color: var(--gray);
-      line-height: 1;
-      margin-bottom: 16px;
-    }
-
-    .step-title {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--black);
-      margin-bottom: 8px;
-    }
-
-    .step-desc {
-      font-size: 12px;
-      line-height: 1.75;
-      color: var(--black);
-      opacity: 0.5;
-    }
-
-    /* NOSOTROS */
-    .nosotros {
-      display: grid;
-      grid-template-columns: 160px 1fr;
-      border-bottom: 0.5px solid var(--gray);
-    }
-
-    .nosotros-left {
-      padding: 48px 32px;
-      border-right: 0.5px solid var(--gray);
-    }
-
-    .nosotros-right { padding: 48px 52px; }
-
-    .nosotros-right p.lead {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 21px;
-      font-weight: 300;
-      line-height: 1.5;
-      color: var(--black);
-      margin-bottom: 14px;
-    }
-
-    .nosotros-right p.lead em { font-style: italic; opacity: 0.4; }
-
-    .nosotros-right p.body {
-      font-size: 13px;
-      line-height: 1.8;
-      color: var(--black);
-      opacity: 0.5;
-      max-width: 480px;
-    }
-
-    /* MI VIAJE */
-    .mi-viaje-section {
-      background: var(--black);
-      padding: 64px 48px;
-    }
-
-    .mi-viaje-inner { max-width: 480px; }
-
-    .mi-viaje-label {
-      font-size: 10px;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.25);
-      margin-bottom: 16px;
-      display: block;
-    }
-
-    .mi-viaje-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 36px;
-      font-weight: 300;
-      color: var(--white);
-      line-height: 1.15;
-      margin-bottom: 16px;
-    }
-
-    .mi-viaje-desc {
-      font-size: 13px;
-      line-height: 1.8;
-      color: rgba(255,255,255,0.38);
-      margin-bottom: 32px;
-      max-width: 360px;
-    }
-
-    .portal-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      background: var(--white);
-      color: var(--black);
-      border: none;
-      padding: 12px 26px;
-      font-size: 11px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.2s;
-      font-family: 'DM Sans', sans-serif;
-      text-decoration: none;
-    }
-    .portal-btn:hover { background: var(--gray); }
-
-    /* FOOTER */
-    footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 22px 48px;
-      border-top: 0.5px solid var(--gray);
-    }
-
-    .footer-logo {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 14px;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-
-    .footer-copy {
-      font-size: 11px;
-      color: var(--black);
-      opacity: 0.3;
-    }
-
-    /* RESPONSIVE */
-    @media (max-width: 768px) {
-      nav { padding: 18px 24px; }
-      .nav-divider { margin: 0 20px; }
-      .hero { grid-template-columns: 1fr; height: auto; }
-      .hero-left { padding: 48px 24px; min-height: 260px; }
-      .hero-right { height: 200px; }
-      .section { padding: 48px 24px; }
-      .steps { grid-template-columns: 1fr; }
-      .step { border-right: 0.5px solid var(--gray) !important; border-bottom: none; }
-      .step:last-child { border-bottom: 0.5px solid var(--gray); }
-      .nosotros { grid-template-columns: 1fr; }
-      .nosotros-left { padding: 32px 24px; border-right: none; border-bottom: 0.5px solid var(--gray); }
-      .nosotros-right { padding: 32px 24px; }
-      .mi-viaje-section { padding: 48px 24px; }
-      footer { padding: 20px 24px; flex-direction: column; gap: 8px; text-align: center; }
-    }
-  </style>
+  @media (max-width: 768px) {
+    .section-steps { padding: 56px 24px; }
+    .steps-row { grid-template-columns: 1fr; gap: 24px; }
+    .step-arrow { display: none; }
+  }
+</style>
 </head>
 <body>
 
-  <!-- NAV -->
-  <nav>
-    <a class="logo" href="#">Coordenada 90</a>
-    <div class="nav-divider"></div>
-    <ul class="nav-links">
-      <li><a href="#nosotros">Nosotros</a></li>
-      <li><a href="#mi-viaje">Mi viaje</a></li>
-    </ul>
-    <div class="nav-right">
-      <button class="nav-cta">Planear mi viaje</button>
-      <button class="chat-icon-btn" title="Iniciar conversación" aria-label="Chat">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-        </svg>
-      </button>
-    </div>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div class="grain"></div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="logo">Coordenada <span style="opacity:.4">90</span></div>
+  <nav class="nav">
   </nav>
+</header>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-left">
-      <h1 class="hero-title">
-        Tu viaje,<br>
-        exactamente<br>
-        <em>donde quieres.</em>
-      </h1>
-    </div>
-    <div class="hero-right">
-      <img
-        src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80&auto=format&fit=crop"
-        alt="Destino de viaje"
-      />
-    </div>
-  </section>
+<!-- HERO -->
+<section class="hero">
 
-  <!-- PROCESO -->
-  <section class="section">
-    <div class="section-header">
-      <span class="section-label">El proceso</span>
+  <!-- Globe -->
+  <canvas id="globe-canvas" width="720" height="720"></canvas>
+
+  <!-- Compass SVG -->
+  <div class="compass-wrap">
+    <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- outer ring -->
+      <circle class="compass-ring" cx="50" cy="50" r="46" stroke="#0e0e0e" stroke-width="0.6" stroke-dasharray="2 4"/>
+      <!-- inner ring -->
+      <circle cx="50" cy="50" r="36" stroke="#0e0e0e" stroke-width="0.4" opacity="0.3"/>
+      <!-- cardinal ticks -->
+      <line x1="50" y1="4"  x2="50" y2="12" stroke="#0e0e0e" stroke-width="1" class="compass-tick"/>
+      <line x1="50" y1="88" x2="50" y2="96" stroke="#0e0e0e" stroke-width="1" class="compass-tick"/>
+      <line x1="4"  y1="50" x2="12" y2="50" stroke="#0e0e0e" stroke-width="1" class="compass-tick"/>
+      <line x1="88" y1="50" x2="96" y2="50" stroke="#0e0e0e" stroke-width="1" class="compass-tick"/>
+      <!-- diagonal ticks -->
+      <line x1="17" y1="17" x2="21" y2="21" stroke="#0e0e0e" stroke-width="0.5" opacity="0.4"/>
+      <line x1="83" y1="17" x2="79" y2="21" stroke="#0e0e0e" stroke-width="0.5" opacity="0.4"/>
+      <line x1="17" y1="83" x2="21" y2="79" stroke="#0e0e0e" stroke-width="0.5" opacity="0.4"/>
+      <line x1="83" y1="83" x2="79" y2="79" stroke="#0e0e0e" stroke-width="0.5" opacity="0.4"/>
+      <!-- Needle group -->
+      <g class="needle-n">
+        <!-- North (dark) -->
+        <polygon points="50,14 53,50 50,46 47,50" fill="#0e0e0e"/>
+        <!-- South (light) -->
+        <polygon points="50,86 53,50 50,54 47,50" fill="#0e0e0e" opacity="0.2"/>
+      </g>
+      <!-- center dot -->
+      <circle cx="50" cy="50" r="3" fill="#f5f3ef" stroke="#0e0e0e" stroke-width="1"/>
+      <circle cx="50" cy="50" r="1" fill="#0e0e0e"/>
+      <!-- N label -->
+      <text x="50" y="10" text-anchor="middle" font-family="'DM Sans', sans-serif" font-size="6" font-weight="500" letter-spacing="0.1em" fill="#0e0e0e" opacity="0.5">N</text>
+    </svg>
+  </div>
+
+  <!-- Text -->
+  <div class="hero-text">
+    <p class="hero-eyebrow">Planificación de viajes</p>
+    <h1 class="hero-title">El mundo,<br /><em>tu viaje</em></h1>
+    <p class="hero-sub">Itinerarios diseñados para que vivas la mejor experiencia.</p>
+    <a href="#" class="hero-cta">Planear mi viaje <span class="arrow">→</span></a>
+  </div>
+
+  <!-- Coords -->
+  <div class="coords-top">
+    <div class="coord-val"><span id="lat-val">19.4326° N</span></div>
+    <div class="coord-val"><span id="lng-val">99.1332° O</span></div>
+    <div class="coord-val" style="margin-top:8px; font-size:11px; opacity:.4">
+      actualizando
     </div>
-    <div class="steps">
+  </div>
+
+  <!-- Scroll -->
+  <div class="scroll-ind">
+    <div class="scroll-line"></div>
+    <div class="scroll-label">Scroll</div>
+  </div>
+
+</section>
+
+<!-- SECTION 2 -->
+<section class="section-about">
+  <div class="big-num">90</div>
+  <div class="about-inner">
+    <h2 class="about-title">Diseñamos viajes a medida<br /><em>para quienes buscan grandes</em><br /><em>experiencias</em></h2>
+    <p class="about-body">
+      sin invertir tiempo en planear.<br /><br />
+      Nos especializamos en la planeación estratégica, creando itinerarios claros, optimizados y personalizados. Definimos cada detalle para que todo fluya con lógica y precisión. Tú gestionas directamente tus reservaciones y pagos, con total control y flexibilidad. Nos encargamos de que cada viaje encuentre su coordenada exacta.
+    </p>
+  </div>
+</section>
+
+<!-- SECTION 3: PASOS -->
+<section class="section-steps">
+  <div class="steps-inner">
+    <p class="steps-eyebrow">Cómo funciona</p>
+    <div class="steps-row">
       <div class="step">
-        <div class="step-num">01</div>
-        <div class="step-title">Cuéntanos tu viaje</div>
-        <div class="step-desc">Conversamos sobre el destino que tienes en mente, tus fechas, estilo de viaje y presupuesto. Sin formularios, sin complicaciones.</div>
+        <span class="step-num">01</span>
+        <span class="step-title">Cuéntanos tu viaje</span>
+        <span class="step-desc">Destino, fechas, estilo y presupuesto.</span>
       </div>
+      <div class="step-arrow">→</div>
       <div class="step">
-        <div class="step-num">02</div>
-        <div class="step-title">Recibe tu propuesta</div>
-        <div class="step-desc">Diseñamos un itinerario detallado y optimizado. Tú decides, ajustas y tienes el control total de tus reservaciones y pagos.</div>
+        <span class="step-num">02</span>
+        <span class="step-title">Realiza tu pago</span>
+        <span class="step-desc">Recibe tu planeación lista y personalizada.</span>
       </div>
+      <div class="step-arrow">→</div>
       <div class="step">
-        <div class="step-num">03</div>
-        <div class="step-title">Vive la experiencia</div>
-        <div class="step-desc">Accede a tu portal personal para seguir cada detalle del plan en tiempo real, desde cualquier dispositivo.</div>
+        <span class="step-num">03</span>
+        <span class="step-title">Reserva</span>
+        <span class="step-desc">Tú gestionas vuelos y hoteles directamente.</span>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step">
+        <span class="step-num">04</span>
+        <span class="step-title">Viaja</span>
+        <span class="step-desc">Todo listo. Solo disfruta cada coordenada.</span>
       </div>
     </div>
-  </section>
-
-  <!-- NOSOTROS -->
-  <section class="nosotros" id="nosotros">
-    <div class="nosotros-left">
-      <span class="section-label">Nosotros</span>
+    <div class="steps-cta">
+      <a href="#" class="btn-planear">Planear mi viaje <span class="arrow">→</span></a>
     </div>
-    <div class="nosotros-right">
-      <p class="lead">
-        Diseñamos viajes a medida para quienes buscan <em>grandes experiencias</em> sin invertir tiempo en planear.
-      </p>
-      <p class="body">
-        Nos especializamos en la planeación estratégica, creando itinerarios claros, optimizados y personalizados. Definimos cada detalle para que todo fluya con lógica y precisión. Tú gestionas directamente tus reservaciones y pagos, con total control y flexibilidad. Nos encargamos de que cada viaje encuentre su coordenada exacta.
-      </p>
-    </div>
-  </section>
+  </div>
+</section>
 
-  <!-- MI VIAJE -->
-  <section class="mi-viaje-section" id="mi-viaje">
-    <div class="mi-viaje-inner">
-      <span class="mi-viaje-label">Portal del viajero</span>
-      <h2 class="mi-viaje-title">Mi viaje.</h2>
-      <p class="mi-viaje-desc">
-        Ingresa con tu código de acceso y consulta tu itinerario, documentos y cada detalle de tu viaje en un solo lugar.
-      </p>
-      <a class="portal-btn" href="/mi-viaje">Ingresar →</a>
-    </div>
-  </section>
+<script>
+/* ── CURSOR ── */
+const cursor     = document.getElementById('cursor');
+const cursorRing = document.getElementById('cursorRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
 
-  <!-- FOOTER -->
-  <footer>
-    <div class="footer-logo">Coordenada 90</div>
-    <span class="footer-copy">© 2025 Coordenada 90</span>
-  </footer>
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx + 'px';
+  cursor.style.top  = my + 'px';
+});
 
+(function animRing() {
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) *.12;
+  cursorRing.style.left = rx + 'px';
+  cursorRing.style.top  = ry + 'px';
+  requestAnimationFrame(animRing);
+})();
+
+document.querySelectorAll('a, button').forEach(el => {
+  el.addEventListener('mouseenter', () => {
+    cursorRing.style.width  = '52px';
+    cursorRing.style.height = '52px';
+    cursorRing.style.opacity = '0.5';
+  });
+  el.addEventListener('mouseleave', () => {
+    cursorRing.style.width  = '32px';
+    cursorRing.style.height = '32px';
+    cursorRing.style.opacity = '1';
+  });
+});
+
+/* ── GLOBE ── */
+const canvas = document.getElementById('globe-canvas');
+const ctx    = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+const CX = W / 2, CY = H / 2;
+const R  = 280;
+
+let rotation = 0;
+let mouseInfluence = 0;
+
+// Cities to mark on globe — curated for even global distribution
+const CITIES = [
+  // América del Norte — bien espaciadas
+  { name: "Mazatlán",    lat: 23.22,  lng: -106.42 },
+  { name: "CDMX",        lat: 19.43,  lng:  -99.13 },
+  { name: "Nueva York",  lat: 40.71,  lng:  -74.00 },
+  { name: "Vancouver",   lat: 49.28,  lng: -123.12 },
+  { name: "Banff",       lat: 51.18,  lng: -115.57 },
+  { name: "Reykjavík",   lat: 64.13,  lng:  -21.90 },
+  // Caribe
+  { name: "Habana",      lat: 23.14,  lng:  -82.36 },
+  // América del Sur — una por zona
+  { name: "Bogotá",      lat:  4.71,  lng:  -74.07 },
+  { name: "Lima",        lat: -12.05, lng:  -77.04 },
+  { name: "Río",         lat: -22.91, lng:  -43.17 },
+  { name: "Buenos Aires",lat: -34.61, lng:  -58.38 },
+  // Europa — evitando vecinos inmediatos
+  { name: "Lisboa",      lat: 38.72,  lng:   -9.14 },
+  { name: "Londres",     lat: 51.51,  lng:   -0.13 },
+  { name: "París",       lat: 48.86,  lng:    2.35 },
+  { name: "Barcelona",   lat: 41.39,  lng:    2.15 },
+  { name: "Roma",        lat: 41.90,  lng:   12.50 },
+  { name: "Berlín",      lat: 52.52,  lng:   13.40 },
+  { name: "Estambul",    lat: 41.01,  lng:   28.97 },
+  { name: "Oslo",        lat: 59.91,  lng:   10.75 },
+  // África — una por región
+  { name: "Marrakech",   lat: 31.63,  lng:   -8.01 },
+  { name: "El Cairo",    lat: 30.04,  lng:   31.24 },
+  { name: "Nairobi",     lat: -1.29,  lng:   36.82 },
+  { name: "Cape Town",   lat: -33.93, lng:   18.42 },
+  // Oriente Medio / Asia Occidental
+  { name: "Dubái",       lat: 25.20,  lng:   55.27 },
+  // Asia — bien separadas en longitud
+  { name: "Delhi",       lat: 28.61,  lng:   77.21 },
+  { name: "Bangkok",     lat: 13.75,  lng:  100.52 },
+  { name: "Singapur",    lat:  1.35,  lng:  103.82 },
+  { name: "Shanghái",    lat: 31.23,  lng:  121.47 },
+  { name: "Tokyo",       lat: 35.68,  lng:  139.69 },
+  { name: "Seúl",        lat: 37.57,  lng:  126.98 },
+  // Oceanía
+  { name: "Sídney",      lat: -33.87, lng:  151.21 },
+  { name: "Auckland",    lat: -36.85, lng:  174.76 },
+];
+
+function project(lat, lng, rot) {
+  const phi   = (90 - lat) * Math.PI / 180;
+  const theta = (lng + rot) * Math.PI / 180;
+  const x = R * Math.sin(phi) * Math.cos(theta);
+  const y = R * Math.cos(phi);
+  const z = R * Math.sin(phi) * Math.sin(theta);
+  return { x: CX + x, y: CY - y, z, visible: z > 0 };
+}
+
+function drawGlobe(rot) {
+  ctx.clearRect(0, 0, W, H);
+
+  // Subtle glow
+  const grd = ctx.createRadialGradient(CX, CY, R * 0.2, CX, CY, R * 1.1);
+  grd.addColorStop(0, 'rgba(14,14,14,0.0)');
+  grd.addColorStop(1, 'rgba(14,14,14,0.04)');
+  ctx.beginPath();
+  ctx.arc(CX, CY, R, 0, Math.PI * 2);
+  ctx.fillStyle = grd;
+  ctx.fill();
+
+  // Latitude lines
+  const latLines = [-60,-45,-30,-15,0,15,30,45,60];
+  latLines.forEach(lat => {
+    const phi = (90 - lat) * Math.PI / 180;
+    const ry2 = R * Math.sin(phi);
+    const cy2 = CY - R * Math.cos(phi);
+    if (ry2 < 0) return;
+
+    ctx.beginPath();
+    ctx.ellipse(CX, cy2, ry2, ry2 * 0.08, 0, 0, Math.PI * 2);
+    ctx.strokeStyle = lat === 0
+      ? 'rgba(14,14,14,0.18)'
+      : 'rgba(14,14,14,0.07)';
+    ctx.lineWidth = lat === 0 ? 0.8 : 0.5;
+    ctx.stroke();
+  });
+
+  // Longitude lines (meridians)
+  const lngStep = 20;
+  for (let lng = 0; lng < 360; lng += lngStep) {
+    const angle = (lng + rot) * Math.PI / 180;
+    const visible = Math.cos(angle) > 0;
+    ctx.beginPath();
+    ctx.ellipse(CX, CY, R * Math.abs(Math.sin(angle)), R, 0, 0, Math.PI * 2);
+    ctx.strokeStyle = visible
+      ? 'rgba(14,14,14,0.1)'
+      : 'rgba(14,14,14,0.03)';
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+  }
+
+  // Outer circle
+  ctx.beginPath();
+  ctx.arc(CX, CY, R, 0, Math.PI * 2);
+  ctx.strokeStyle = 'rgba(14,14,14,0.2)';
+  ctx.lineWidth = 0.8;
+  ctx.stroke();
+
+  // Polar dots
+  ctx.beginPath();
+  ctx.arc(CX, CY - R, 2, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(14,14,14,0.2)';
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(CX, CY + R, 2, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Priority cities that always show label
+  const LABEL_CITIES = ["CDMX","Mazatlán","Tokyo","Reykjavík","Barcelona","Estambul","Roma","Banff","París","Londres","Sídney","Dubái","Nairobi","Buenos Aires","Pekín","Singapur"];
+
+  // Cities
+  CITIES.forEach(city => {
+    const p = project(city.lat, city.lng, rot);
+    if (!p.visible) return;
+
+    const alpha = Math.min(1, (p.z / R));
+    const isKey = LABEL_CITIES.includes(city.name);
+
+    // dot
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, isKey ? 2.5 : 1.5, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(14,14,14,${alpha * (isKey ? 0.85 : 0.45)})`;
+    ctx.fill();
+
+    // pulse ring only for key cities
+    if (isKey) {
+      const pulse = (Math.sin(Date.now() * 0.002 + city.lat) + 1) / 2;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 2.5 + pulse * 5, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(14,14,14,${alpha * 0.25 * (1 - pulse)})`;
+      ctx.lineWidth = 0.7;
+      ctx.stroke();
+    }
+
+    // label only for key cities
+    if (isKey) {
+      const lo = city.labelOffset || { x: 6, y: 3 };
+      ctx.font = `300 8px 'DM Sans', sans-serif`;
+      ctx.fillStyle = `rgba(14,14,14,${alpha * 0.6})`;
+      ctx.fillText(city.name.toUpperCase(), p.x + lo.x, p.y + lo.y);
+    }
+  });
+
+  // Center crosshair
+  const crossSize = 12;
+  ctx.strokeStyle = 'rgba(14,14,14,0.15)';
+  ctx.lineWidth = 0.5;
+  ctx.beginPath(); ctx.moveTo(CX - crossSize, CY); ctx.lineTo(CX + crossSize, CY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(CX, CY - crossSize); ctx.lineTo(CX, CY + crossSize); ctx.stroke();
+}
+
+// Coordinate display update
+function updateCoords(rot) {
+  const lng = ((-rot % 360) + 360) % 360;
+  const lngDisplay = lng > 180 ? (360 - lng).toFixed(4) + '° E' : lng.toFixed(4) + '° O';
+  const latDisplay = '19.4326° N';
+  document.getElementById('lat-val').textContent = latDisplay;
+  document.getElementById('lng-val').textContent = lngDisplay;
+}
+
+// Globe mouse interaction
+let targetRot = 0;
+document.addEventListener('mousemove', e => {
+  const nx = (e.clientX / window.innerWidth - 0.5) * 2;
+  targetRot = nx * 15;
+});
+
+// Animation loop
+function animate() {
+  rotation += 0.08;
+  mouseInfluence += (targetRot - mouseInfluence) * 0.04;
+  drawGlobe(rotation + mouseInfluence);
+  updateCoords(rotation + mouseInfluence);
+  requestAnimationFrame(animate);
+}
+
+animate();
+
+/* ── SCROLL PARALLAX ── */
+window.addEventListener('scroll', () => {
+  const y = window.scrollY;
+  const globe = document.getElementById('globe-canvas');
+  const compass = document.querySelector('.compass-wrap');
+  globe.style.transform   = `translate(-50%, calc(-50% + ${y * 0.15}px)) scale(${1 - y * 0.0003})`;
+  compass.style.transform = `translate(-50%, calc(-50% + ${y * 0.18}px))`;
+  compass.style.opacity   = Math.max(0, 1 - y * 0.004);
+});
+</script>
 </body>
 </html>
