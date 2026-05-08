@@ -342,6 +342,168 @@
     .steps-row { grid-template-columns: 1fr; gap: 24px; }
     .step-arrow { display: none; }
   }
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 2000;
+    background: rgba(14,14,14,0.55);
+    backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.35s ease;
+    padding: 24px;
+  }
+  .modal-overlay.open {
+    opacity: 1; pointer-events: all;
+  }
+  .modal {
+    background: var(--paper);
+    width: 100%; max-width: 520px;
+    max-height: 90vh; overflow-y: auto;
+    padding: 48px 44px;
+    position: relative;
+    transform: translateY(20px);
+    transition: transform 0.35s ease;
+  }
+  .modal-overlay.open .modal {
+    transform: translateY(0);
+  }
+  .modal-close {
+    position: absolute; top: 20px; right: 24px;
+    font-size: 20px; color: var(--muted);
+    background: none; border: none; cursor: none;
+    line-height: 1; transition: color 0.2s;
+  }
+  .modal-close:hover { color: var(--ink); }
+
+  /* Modal steps indicator */
+  .modal-steps {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 36px;
+  }
+  .modal-step-dot {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 1px solid #ccc;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 500; color: #aaa;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.3s;
+  }
+  .modal-step-dot.active { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .modal-step-dot.done   { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .modal-step-line { flex: 1; height: 1px; background: #e0ddd8; }
+  .modal-step-line.done { background: var(--ink); }
+
+  /* Modal fields */
+  .modal-eyebrow {
+    font-size: 10px; font-weight: 500; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--muted); margin-bottom: 10px;
+  }
+  .modal-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 30px; font-weight: 300; line-height: 1.1;
+    margin-bottom: 28px;
+  }
+  .modal-title em { font-style: italic; }
+
+  .m-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .m-grid.full { grid-template-columns: 1fr; }
+  .m-field { display: flex; flex-direction: column; gap: 6px; }
+  .m-field label {
+    font-size: 10px; font-weight: 500; letter-spacing: 0.16em;
+    text-transform: uppercase; color: #888;
+  }
+  .m-field input, .m-field select, .m-field textarea {
+    padding: 11px 13px; border: 1px solid #e0ddd8; background: #fff;
+    font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--ink);
+    outline: none; border-radius: 0; -webkit-appearance: none;
+    transition: border-color 0.2s;
+  }
+  .m-field input:focus, .m-field select:focus { border-color: var(--ink); }
+  .m-field select {
+    background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23666' stroke-width='1.2'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center;
+    padding-right: 32px; cursor: none;
+  }
+
+  /* Chips */
+  .m-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 4px; }
+  .m-chip {
+    padding: 6px 12px; border: 1px solid #e0ddd8; background: #fff;
+    font-size: 11px; font-family: 'DM Sans', sans-serif; cursor: none;
+    transition: all 0.2s; color: #666;
+  }
+  .m-chip:hover { border-color: #999; }
+  .m-chip.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+  /* Budget slider */
+  .m-budget-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+  .m-budget-label { font-size: 10px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: #888; }
+  .m-budget-val { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 300; }
+  .m-budget-val small { font-family: 'DM Sans', sans-serif; font-size: 11px; color: #aaa; }
+
+  /* Order summary */
+  .m-summary { border: 1px solid #e0ddd8; padding: 18px; background: #fff; margin-bottom: 20px; }
+  .m-summary-title { font-size: 10px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: #888; margin-bottom: 12px; }
+  .m-row { display: flex; justify-content: space-between; font-size: 13px; color: #666; margin-bottom: 8px; }
+  .m-row.total { border-top: 1px solid #e0ddd8; padding-top: 10px; margin-top: 4px; font-weight: 500; color: var(--ink); font-size: 14px; }
+
+  /* Promo */
+  .m-promo-toggle { font-size: 11px; color: #aaa; cursor: none; text-decoration: underline; text-underline-offset: 3px; margin-bottom: 14px; display: inline-block; }
+  .m-promo-toggle:hover { color: var(--ink); }
+  .m-promo-row { display: flex; gap: 8px; margin-bottom: 12px; }
+  .m-promo-row input { flex: 1; padding: 10px 12px; border: 1px solid #e0ddd8; font-family: 'DM Sans', sans-serif; font-size: 12px; outline: none; border-radius: 0; }
+  .m-promo-row input:focus { border-color: var(--ink); }
+  .m-promo-apply { padding: 10px 16px; background: var(--ink); color: #fff; border: none; font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; cursor: none; }
+  .m-promo-msg { font-size: 11px; margin-bottom: 12px; }
+  .m-promo-msg.ok { color: #3a7d44; }
+  .m-promo-msg.err { color: #c0392b; }
+
+  /* Confirmation */
+  .m-confirm {
+    text-align: center; padding: 20px 0;
+  }
+  .m-confirm-icon {
+    width: 48px; height: 48px; border-radius: 50%;
+    border: 1px solid var(--ink);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px; font-size: 20px;
+  }
+  .m-confirm h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px; font-weight: 300; margin-bottom: 12px;
+  }
+  .m-confirm p { font-size: 13px; color: var(--muted); line-height: 1.7; }
+
+  /* Modal CTA */
+  .m-btn {
+    width: 100%; padding: 15px 24px; background: var(--ink); color: #fff;
+    border: none; font-family: 'DM Sans', sans-serif;
+    font-size: 11px; font-weight: 500; letter-spacing: 0.2em;
+    text-transform: uppercase; cursor: none; margin-top: 8px;
+    transition: opacity 0.2s;
+  }
+  .m-btn:hover { opacity: 0.8; }
+  .m-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .m-btn-back {
+    width: 100%; padding: 12px; background: transparent; color: var(--muted);
+    border: 1px solid #e0ddd8; font-family: 'DM Sans', sans-serif;
+    font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+    cursor: none; margin-top: 8px; transition: border-color 0.2s;
+  }
+  .m-btn-back:hover { border-color: var(--ink); color: var(--ink); }
+  .m-field input.error, .m-field select.error {
+    border-color: #c0392b !important;
+    background: #fff8f7;
+  }
+  .m-field .error-msg {
+    font-size: 10px; color: #c0392b; margin-top: 3px;
+    letter-spacing: 0.05em;
+  }
+
+  @media (max-width: 560px) {
+    .modal { padding: 36px 24px; }
+    .m-grid { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
@@ -352,7 +514,7 @@
 
 <!-- HEADER -->
 <header class="header">
-  <img src="LOGO_COORDENADA_90.png" alt="Coordenada 90" style="height: 32px;" />
+  <div class="logo">Coordenada <span style="opacity:.4">90</span></div>
   <nav class="nav">
   </nav>
 </header>
@@ -702,6 +864,285 @@ window.addEventListener('scroll', () => {
   compass.style.transform = `translate(-50%, calc(-50% + ${y * 0.18}px))`;
   compass.style.opacity   = Math.max(0, 1 - y * 0.004);
 });
+</script>
+
+<!-- ── MODAL ── -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal">
+    <button class="modal-close" id="modalClose">✕</button>
+
+    <!-- Step indicator -->
+    <div class="modal-steps">
+      <div class="modal-step-dot" id="sdot1">1</div>
+      <div class="modal-step-line" id="sline1"></div>
+      <div class="modal-step-dot" id="sdot2">2</div>
+      <div class="modal-step-line" id="sline2"></div>
+      <div class="modal-step-dot" id="sdot3">3</div>
+    </div>
+
+    <!-- STEP 1: FORMULARIO -->
+    <div id="mStep1">
+      <p class="modal-eyebrow">Tu próximo viaje</p>
+
+      <div class="m-grid">
+        <div class="m-field">
+          <label>Nombre</label>
+          <input id="mNombre" placeholder="Tu nombre" />
+        </div>
+        <div class="m-field">
+          <label>Correo</label>
+          <input id="mEmail" type="email" placeholder="tu@correo.com" />
+        </div>
+      </div>
+
+      <div class="m-grid full">
+        <div class="m-field">
+          <label>Destino(s)</label>
+          <input id="mDestino" placeholder="ej. Oaxaca, Tokyo, Lisboa…" />
+        </div>
+      </div>
+
+      <div class="m-grid" style="margin-top:14px">
+        <div class="m-field">
+          <label>Fecha de salida</label>
+          <input id="mSalida" type="date" />
+        </div>
+        <div class="m-field">
+          <label>Fecha de regreso</label>
+          <input id="mRegreso" type="date" />
+        </div>
+      </div>
+
+      <div class="m-grid" style="margin-bottom:14px">
+        <div class="m-field">
+          <label>Viajeros</label>
+          <select id="mViajeros">
+            <option>1 viajero</option>
+            <option>2 viajeros</option>
+            <option>3 viajeros</option>
+            <option>4 viajeros</option>
+            <option>5+ viajeros</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Budget -->
+      <div style="margin-bottom:24px">
+        <div class="m-budget-row">
+          <span class="m-budget-label">Presupuesto total</span>
+          <span class="m-budget-val" id="mBudgetVal">$10,000 <small>MXN</small></span>
+        </div>
+        <input type="range" id="mBudgetMax" min="10000" max="300000" step="10000" value="10000"
+          style="width:100%" oninput="updateBudget()" />
+        <div style="display:flex; justify-content:space-between; margin-top:6px">
+          <span style="font-size:10px; color:#bbb">$10,000</span>
+          <span style="font-size:10px; color:#bbb">$300,000+</span>
+        </div>
+      </div>
+
+      <button class="m-btn" id="mBtn1" onclick="validateStep1()">Continuar → Pago</button>
+    </div>
+
+    <!-- STEP 2: PAGO -->
+    <div id="mStep2" style="display:none">
+      <p class="modal-eyebrow">Confirma tu pedido</p>
+      <h2 class="modal-title">Un pago,<br /><em>itinerario listo</em></h2>
+
+      <div class="m-summary">
+        <div class="m-summary-title">Resumen</div>
+        <div class="m-row"><span>Itinerario Coordenada 90</span><span>$850 MXN</span></div>
+        <div class="m-row" id="mResumenDetalle"><span>—</span><span></span></div>
+        <div class="m-row total" id="mTotal"><span>Total</span><span id="mTotalVal">$850 MXN</span></div>
+      </div>
+
+      <span class="m-promo-toggle" onclick="togglePromo()">¿Tienes un código promocional?</span>
+      <div id="mPromoBox" style="display:none">
+        <div class="m-promo-row">
+          <input id="mPromoInput" placeholder="CÓDIGO" oninput="this.value=this.value.toUpperCase()" />
+          <button class="m-promo-apply" onclick="applyPromo()">Aplicar</button>
+        </div>
+        <p class="m-promo-msg" id="mPromoMsg"></p>
+      </div>
+
+      <div class="m-field" style="margin-bottom:14px">
+        <label>Nombre en la tarjeta</label>
+        <input id="mCardName" placeholder="Como aparece en la tarjeta" />
+      </div>
+      <div class="m-field" style="margin-bottom:14px">
+        <label>Número de tarjeta</label>
+        <input id="mCardNum" placeholder="1234 5678 9012 3456" maxlength="19"
+          oninput="this.value=this.value.replace(/\D/g,'').replace(/(.{4})/g,'$1 ').trim()" />
+      </div>
+      <div class="m-grid" style="margin-bottom:20px">
+        <div class="m-field">
+          <label>Vencimiento</label>
+          <input id="mCardExp" placeholder="MM / AA" maxlength="7" />
+        </div>
+        <div class="m-field">
+          <label>CVV</label>
+          <input id="mCardCvv" placeholder="123" maxlength="4"
+            oninput="this.value=this.value.replace(/\D/g,'')" />
+        </div>
+      </div>
+
+      <button class="m-btn" onclick="goStep(3)">Confirmar pago $850 MXN</button>
+      <button class="m-btn-back" onclick="goStep(1)">← Volver</button>
+    </div>
+
+    <!-- STEP 3: CONFIRMACIÓN -->
+    <div id="mStep3" style="display:none">
+      <div class="m-confirm">
+        <div class="m-confirm-icon">✓</div>
+        <h3>¡Todo listo,<br /><em style="font-style:italic; font-weight:300" id="mConfirmNombre"></em>!</h3>
+        <p>
+          Hemos recibido tu solicitud.<br />
+          En breve recibirás tu itinerario personalizado<br />
+          en <strong id="mConfirmEmail"></strong>.<br /><br />
+          <span style="color:#bbb; font-size:12px">Si tienes dudas escríbenos a<br />hola@coordenada90.com</span>
+        </p>
+        <button class="m-btn" style="margin-top:32px" onclick="closeModal()">Cerrar</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ── MODAL ── */
+const overlay = document.getElementById('modalOverlay');
+
+function openModal() {
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+  overlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// Open on all CTA links
+document.querySelectorAll('.hero-cta, .btn-planear').forEach(el => {
+  el.addEventListener('click', e => { e.preventDefault(); openModal(); });
+});
+document.getElementById('modalClose').addEventListener('click', closeModal);
+overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+
+// Validation
+function validateStep1() {
+  const fields = [
+    { id: 'mNombre',  msg: 'Ingresa tu nombre' },
+    { id: 'mEmail',   msg: 'Ingresa tu correo' },
+    { id: 'mDestino', msg: 'Ingresa un destino' },
+    { id: 'mSalida',  msg: 'Selecciona fecha de salida' },
+    { id: 'mRegreso', msg: 'Selecciona fecha de regreso' },
+  ];
+  let valid = true;
+  fields.forEach(f => {
+    const el = document.getElementById(f.id);
+    const existing = el.parentNode.querySelector('.error-msg');
+    if (existing) existing.remove();
+    el.classList.remove('error');
+    if (!el.value.trim()) {
+      el.classList.add('error');
+      const msg = document.createElement('span');
+      msg.className = 'error-msg';
+      msg.textContent = f.msg;
+      el.parentNode.appendChild(msg);
+      valid = false;
+    }
+  });
+  // Check regreso > salida
+  const s = document.getElementById('mSalida').value;
+  const r = document.getElementById('mRegreso').value;
+  if (s && r && new Date(r) <= new Date(s)) {
+    const el = document.getElementById('mRegreso');
+    el.classList.add('error');
+    const existing = el.parentNode.querySelector('.error-msg');
+    if (existing) existing.remove();
+    const msg = document.createElement('span');
+    msg.className = 'error-msg';
+    msg.textContent = 'La fecha de regreso debe ser posterior a la salida';
+    el.parentNode.appendChild(msg);
+    valid = false;
+  }
+  if (valid) goStep(2);
+}
+
+// Steps
+function goStep(n) {
+  [1,2,3].forEach(i => {
+    document.getElementById('mStep'+i).style.display = i === n ? 'block' : 'none';
+    const dot = document.getElementById('sdot'+i);
+    dot.classList.toggle('active', i === n);
+    dot.classList.toggle('done', i < n);
+  });
+  [1,2].forEach(i => {
+    const line = document.getElementById('sline'+i);
+    if (line) line.classList.toggle('done', i < n);
+  });
+
+  // Fill confirm step
+  if (n === 3) {
+    document.getElementById('mConfirmNombre').textContent = document.getElementById('mNombre').value || 'viajero';
+    document.getElementById('mConfirmEmail').textContent  = document.getElementById('mEmail').value || 'tu correo';
+  }
+
+  // Update summary
+  if (n === 2) {
+    const dest    = document.getElementById('mDestino').value || '—';
+    const salida  = document.getElementById('mSalida').value;
+    const regreso = document.getElementById('mRegreso').value;
+    let days = '';
+    if (salida && regreso) {
+      const d = Math.round((new Date(regreso) - new Date(salida)) / 86400000);
+      if (d > 0) days = ` · ${d} días`;
+    }
+    document.getElementById('mResumenDetalle').innerHTML =
+      `<span>${dest}${days}</span><span></span>`;
+  }
+
+  document.getElementById('modal').scrollTop = 0;
+}
+
+// Initialize step 1 as active
+document.getElementById('sdot1').classList.add('active');
+
+// Chips
+function toggleChip(el) { el.classList.toggle('on'); }
+
+// Promo
+const PROMOS = { 'COORDENADA10': 10, 'LAUNCH2025': 20, 'AMIGO': 15 };
+let discount = 0;
+function togglePromo() {
+  const box = document.getElementById('mPromoBox');
+  box.style.display = box.style.display === 'none' ? 'block' : 'none';
+}
+function applyPromo() {
+  const code = document.getElementById('mPromoInput').value.trim().toUpperCase();
+  const msg  = document.getElementById('mPromoMsg');
+  const totalEl = document.getElementById('mTotalVal');
+  if (PROMOS[code]) {
+    discount = PROMOS[code];
+    const final = Math.round(850 * (1 - discount / 100));
+    msg.className = 'm-promo-msg ok';
+    msg.textContent = `✓ ${discount}% de descuento aplicado`;
+    totalEl.textContent = `$${final} MXN`;
+    document.querySelector('[onclick="goStep(3)"]').textContent = `Confirmar pago $${final} MXN`;
+  } else {
+    msg.className = 'm-promo-msg err';
+    msg.textContent = 'Código no válido.';
+  }
+}
+
+// Budget slider
+const slMax = document.getElementById('mBudgetMax');
+const slVal = document.getElementById('mBudgetVal');
+function updateBudget() {
+  const v = parseInt(slMax.value);
+  const label = v >= 300000 ? '$300,000+' : '$' + v.toLocaleString('es-MX');
+  slVal.innerHTML = `${label} <small>MXN</small>`;
+}
+slMax.addEventListener('input', updateBudget);
 </script>
 </body>
 </html>
